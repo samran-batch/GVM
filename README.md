@@ -21,119 +21,72 @@
 - [Generative Video Matting](#-generative-video-matting)
   - [🔥 News](#-news)
   - [🚀 Getting Started](#-getting-started)
-    - [Environment Requirement 🌍](#environment-requirement-)
-    - [Download Model Weights ⬇️](#download-️model-weights-)
+    - [Docker Setup 🐳](#docker-setup-)
   - [🏃🏼 Run](#-run)
-    - [Inference 📜](#inference-)
-    - [Evaluation 📏](#evaluation-)
+    - [Docker Inference 🐳](#docker-inference-)
   - [🎫 License](#-license)
   - [📢 Disclaimer](#-disclaimer)
   - [🤝 Cite Us](#-cite-us)
 
-## 🔥 News
-- **August 10, 2025:** Release the inference code and model checkpoints.
-- **June 11, 2025:** Repo created. The code and dataset for this project are currently being prepared for release and will be available here soon. Please stay tuned!
 
 
 ## 🚀 Getting Started
 
-### Environment Requirement 🌍
+### Docker Setup 🐳
 
 First, clone the repo:
 
-```
-git clone https://github.com/aim-uofa/GVM.git
+```bash
+https://github.com/samran-batch/GVM.git
 cd GVM
 ```
 
-Then, we recommend you first use `conda` to create virtual environment, and install needed libraries. For example:
+**Build the Docker image:**
 
-```
-conda create -n gvm python=3.10 -y
-conda activate gvm
-pip install -r requirements.txt
-python setup.py develop
-```
+This will automatically download model weights from HuggingFace (`geyongtao/gvm`) during the build process.
 
-### Download Model Weights ⬇️
-
-You need to download the model weights by:
-
-```
-hugginface-cli download geyongtao/gvm --local-dir data/weights
+```bash
+docker build -t gvm-image .
 ```
 
-The ckpt structure should be like:
+**Run interactively:**
+```bash
+docker run --name gvm-container -it --rm \
+  -v $(pwd)/data:/workspace/gvm/data \
+  -v $(pwd)/output:/workspace/gvm/output \
+  gvm-image bash
+```
 
-```
-|-- GVM    
-    |-- data
-        |-- weights
-            |-- vae
-                |-- config.json
-                |-- diffusion_pytorch_model.safetensors
-            |-- unet
-                |-- config.json
-                |-- diffusion_pytorch_model.safetensors
-            |-- scheduler
-                |-- scheduler_config.json  
-        |-- datasets
-        |-- demo_videos
-```
+Inside the container, the model weights are already downloaded at `data/weights/`.
 
 
 
 ## 🏃🏼 Run
 
-### Inference 📜
+### Docker Inference 🐳
 
-You can run generative video matting with:
+Place your video file in the `data/demo_videos/` directory, then run:
 
-```
-python demo.py \
---model_base 'data/weights/' \
---unet_base data/weights/unet \
---lora_base data/weights/unet \
---mode 'matte' \
---num_frames_per_batch 8 \
---num_interp_frames 1 \
---num_overlap_frames 1 \
---denoise_steps 1 \
---decode_chunk_size 8 \
---max_resolution 960 \
---pretrain_type 'svd' \
---data_dir 'data/demo_videos/xxx.mp4' \
---output_dir 'output_path'
-```
-
-
-### Evaluation 📏
-
-```
-TODO
+```bash
+docker run --name gvm-container --rm \
+  -v $(pwd)/data:/workspace/gvm/data \
+  -v $(pwd)/output:/workspace/gvm/output \
+  gvm-image python demo.py \
+  --model_base data/weights/ \
+  --unet_base data/weights/unet \
+  --lora_base data/weights/unet \
+  --mode matte \
+  --num_frames_per_batch 8 \
+  --num_interp_frames 1 \
+  --num_overlap_frames 1 \
+  --denoise_steps 1 \
+  --decode_chunk_size 8 \
+  --max_resolution 960 \
+  --pretrain_type svd \
+  --data_dir data/demo_videos/video.mp4 \
+  --output_dir output
 ```
 
+**Note:** Replace `video.mp4` with your actual video filename.
 
-## 🎫 License
-
-For academic usage, this project is licensed under [the 2-clause BSD License](LICENSE). For commercial inquiries, please contact [Chunhua Shen](mailto:chhshen@gmail.com).
-
-
-## 📢 Disclaimer
-
-This repository provides a one-step model for faster inference speed. Its performance is slightly different from the results reported in the original SIGRRAPH paper.
-
-## 🤝 Cite Us
-
-If you find this work helpful for your research, please cite:
-```
-@inproceedings{ge2025gvm,
-author = {Ge, Yongtao and Xie, Kangyang and Xu, Guangkai and Ke, Li and Liu, Mingyu and Huang, Longtao and Xue, Hui and Chen, Hao and Shen, Chunhua},
-title = {Generative Video Matting},
-publisher = {Association for Computing Machinery},
-url = {https://doi.org/10.1145/3721238.3730642},
-doi = {10.1145/3721238.3730642},
-booktitle = {Proceedings of the Special Interest Group on Computer Graphics and Interactive Techniques Conference Conference Papers},
-series = {SIGGRAPH Conference Papers '25}
-}
-```
+**Output:** Results will be saved in the `output/` directory on your host machine.
