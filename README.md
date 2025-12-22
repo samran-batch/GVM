@@ -37,7 +37,7 @@
 First, clone the repo:
 
 ```bash
-https://github.com/samran-batch/GVM.git
+git clone https://github.com/samran-batch/GVM.git
 cd GVM
 ```
 
