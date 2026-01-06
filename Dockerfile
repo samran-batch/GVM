@@ -1,6 +1,11 @@
-FROM ubuntu:22.04
+FROM nvidia/cuda:13.0.0-cudnn-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG NO_ALBUMENTATIONS_UPDATE=1
+# update it according to your GPU
+# https://developer.nvidia.com/cuda-gpus
+# Blackwell sm_120 supported via PyTorch 2.9.1+cu130
+ARG TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;12.0+PTX"
 
 # Install Python 3.11 and system dependencies
 RUN apt update -y && apt install -y \
@@ -15,8 +20,8 @@ RUN apt update -y && apt install -y \
 
 WORKDIR /workspace
 
-# Install PyTorch CPU version
-RUN pip install torch==2.6.0 torchvision==0.21.0 torchaudio --index-url https://download.pytorch.org/whl/cpu
+# Install PyTorch 2.9.1 with CUDA 13.0 support (works with Blackwell sm_120)
+RUN pip install torch==2.9.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
 
 # Copy project files
 COPY . /workspace/gvm/

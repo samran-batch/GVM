@@ -3,25 +3,12 @@
     <h1>Generative Video Matting</h1>
 </div>
 
-**SIGGRAPH2025**
-
-<p align="center">
-<a href='https://yongtaoge.github.io/project/gvm'><img src='https://img.shields.io/badge/Project-Page-Green'></a> &nbsp;
-<a href="https://arxiv.org/abs/2508.07905"><img src="https://img.shields.io/badge/arXiv-2508.07905-b31b1b.svg"></a> &nbsp;
-<a href="https://github.com/aim-uofa/GVM"><img src="https://img.shields.io/badge/GitHub-Code-black?logo=github"></a> &nbsp;
-<a href='https://huggingface.co/datasets/geyongtao/SynHairMan'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-blue'></a> &nbsp;
-<a href="https://huggingface.co/geyongtao/gvm"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue"></a>
-</p>
-
-</div>
-
 
 ##  📖 Table of Contents
 
 - [Generative Video Matting](#-generative-video-matting)
-  - [🔥 News](#-news)
   - [🚀 Getting Started](#-getting-started)
-    - [Docker Setup 🐳](#docker-setup-)
+    - [Project Setup 🐳](#project-setup-)
   - [🏃🏼 Run](#-run)
     - [Docker Inference 🐳](#docker-inference-)
   - [🎫 License](#-license)
@@ -32,12 +19,12 @@
 
 ## 🚀 Getting Started
 
-### Docker Setup 🐳
+### Project Setup 🐳
 
 First, clone the repo:
 
 ```bash
-https://github.com/samran-batch/GVM.git
+git clone https://github.com/samran-batch/GVM.git
 cd GVM
 ```
 
@@ -49,15 +36,26 @@ This will automatically download model weights from HuggingFace (`geyongtao/gvm`
 docker build -t gvm-image .
 ```
 
-**Run interactively:**
+**Run interactively with GPU:**
+
 ```bash
-docker run --name gvm-container -it --rm \
+# Use specific GPU (e.g., GPU 7)
+docker run --gpus '"device=7"' --name gvm-container -it --rm \
   -v $(pwd)/data:/workspace/gvm/data \
   -v $(pwd)/output:/workspace/gvm/output \
   gvm-image bash
 ```
 
 Inside the container, the model weights are already downloaded at `data/weights/`.
+
+**GPU Selection Options:**
+
+```bash
+--gpus '"device=0"'      # Specific GPU by ID
+--gpus '"device=0,1"'    # Multiple GPUs
+--gpus all               # All GPUs
+--gpus all -e CUDA_VISIBLE_DEVICES=7  # All GPUs, use specific one
+```
 
 
 
@@ -68,7 +66,8 @@ Inside the container, the model weights are already downloaded at `data/weights/
 Place your video file in the `data/demo_videos/` directory, then run:
 
 ```bash
-docker run --name gvm-container --rm \
+# Using specific GPU (e.g., GPU 7)
+docker run --gpus '"device=7"' --name gvm-container --rm \
   -v $(pwd)/data:/workspace/gvm/data \
   -v $(pwd)/output:/workspace/gvm/output \
   gvm-image python demo.py \
