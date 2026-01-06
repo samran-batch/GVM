@@ -1,11 +1,9 @@
 FROM nvidia/cuda:13.0.0-cudnn-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG NO_ALBUMENTATIONS_UPDATE=1
-# update it according to your GPU
+# Blackwell GPU (sm_120) - RTX PRO 6000
 # https://developer.nvidia.com/cuda-gpus
-# Blackwell sm_120 supported via PyTorch 2.9.1+cu130
-ARG TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;12.0+PTX"
+ENV TORCH_CUDA_ARCH_LIST="12.0"
 
 # Install Python 3.11 and system dependencies
 RUN apt update -y && apt install -y \
@@ -31,12 +29,6 @@ WORKDIR /workspace/gvm
 # Install project dependencies
 RUN pip install -r requirements.txt && \
   python setup.py develop
-
-# Install huggingface_hub for downloading weights
-RUN pip install huggingface_hub
-
-# Create necessary directories
-RUN mkdir -p data/datasets data/demo_videos data/weights
 
 WORKDIR /workspace/gvm
 
