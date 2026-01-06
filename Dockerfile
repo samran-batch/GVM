@@ -32,10 +32,10 @@ WORKDIR /workspace/gvm
 RUN pip install -r requirements.txt && \
   python setup.py develop
 
-# Install huggingface_hub (weights will be mounted at runtime)
+# Install huggingface_hub for downloading weights
 RUN pip install huggingface_hub
 
-# Create necessary directories (weights will be mounted from host)
+# Create necessary directories
 RUN mkdir -p data/datasets data/demo_videos data/weights
 
 WORKDIR /workspace/gvm
