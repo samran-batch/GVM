@@ -28,17 +28,20 @@ git clone https://github.com/samran-batch/GVM.git
 cd GVM
 ```
 
-**Download model weights locally (one-time setup):**
-
-```bash
-pip install huggingface_hub
-huggingface-cli download geyongtao/gvm --local-dir data/weights
-```
-
 **Build the Docker image:**
 
 ```bash
 docker build -t gvm-image .
+```
+
+**Download model weights (one-time setup):**
+
+Run this once to download weights to your local `data/weights/` folder. They will persist for future use.
+
+```bash
+docker run --gpus '"device=7"' --rm \
+  -v $(pwd)/data:/workspace/gvm/data \
+  gvm-image huggingface-cli download geyongtao/gvm --local-dir data/weights
 ```
 
 **Run interactively with GPU:**
@@ -51,7 +54,7 @@ docker run --gpus '"device=7"' --name gvm-container -it --rm \
   gvm-image bash
 ```
 
-The model weights are mounted from your local `data/weights/` directory.
+The model weights are stored in your local `data/weights/` directory and mounted into the container.
 
 **GPU Selection Options:**
 
