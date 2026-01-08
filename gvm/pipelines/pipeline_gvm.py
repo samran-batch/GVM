@@ -175,16 +175,12 @@ class GVMPipeline(DiffusionPipeline, GVMLoraLoader):
             # num_interp_frames = num_frames - 2
             key_frame_indices = []
             for i in range(0, N, num_frames - num_overlap_frames):
-                if (
-                    i + num_frames - 1 >= N
-                    or len(key_frame_indices) >= num_frames
-                ):
-
-                    # print(i)
-                    pass
-
+                if i >= N:
+                    break
                 key_frame_indices.append(i)
                 key_frame_indices.append(min(N - 1, i + num_frames - 1))
+                if i + num_frames - 1 >= N - 1:  # reached the end
+                    break
 
             key_frame_indices = torch.tensor(key_frame_indices, device=rgb.device)
             
